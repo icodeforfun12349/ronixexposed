@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RONIX EXPOSED - Complete Technical Analysis</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #00ff88;
+            --secondary: #ff3366;
+            --dark: #0a0a0a;
+            --dark-light: #1a1a1a;
+            --text: #ffffff;
+            --text-dim: #888;
+            --accent: #00ccff;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        
+        /* Matrix Rain Background */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.05;
+        }
+        
+        .matrix-column {
+            position: absolute;
+            top: -100px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--primary);
+            animation: matrix-fall linear infinite;
+            white-space: nowrap;
+        }
+        
+        @keyframes matrix-fall {
+            0% { transform: translateY(-100px); }
+            100% { transform: translateY(100vh); }
+        }
+        
+        /* Welcome Screen */
+        .welcome-screen {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: radial-gradient(circle at center, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+        }
+        
+        .glitch {
+            font-size: 4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            position: relative;
+            margin-bottom: 2rem;
+            animation: glitch 3s infinite;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            animation: glitch-1 3s infinite;
+            color: var(--secondary);
+            z-index: -1;
+        }
+        
+        .glitch::after {
+            animation: glitch-2 3s infinite;
+            color: var(--accent);
+            z-index: -2;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+        
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(2px, -2px); }
+            40% { transform: translate(-2px, 2px); }
+            60% { transform: translate(-2px, -2px); }
+            80% { transform: translate(2px, 2px); }
+        }
+        
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, -2px); }
+            40% { transform: translate(2px, 2px); }
+            60% { transform: translate(2px, -2px); }
+            80% { transform: translate(-2px, 2px); }
+        }
+        
+        .typewriter {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 3rem;
+            border-right: 2px solid var(--primary);
+            padding-right: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typing 3s steps(40) 1s forwards, blink 1s infinite;
+            width: 0;
+        }
+        
+        @keyframes typing {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .scroll-indicator:hover {
+            transform: translateX(-50%) scale(1.1);
+            color: var(--primary);
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 5rem 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+        
+        .section {
+            margin-bottom: 8rem;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .section-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-right: 2rem;
+            text-shadow: 0 0 20px var(--primary);
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--text), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .code-block {
+            background: linear-gradient(135deg, var(--dark-light), rgba(26, 26, 26, 0.8));
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scan 2s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .highlight {
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .danger {
+            color: var(--secondary);
+            font-weight: 500;
+        }
+        
+        .info {
+            color: var(--accent);
+            font-weight: 500;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--dark-light), rgba(26, 26, 26, 0.5));
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1);
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, rgba(255, 51, 102, 0.1), rgba(255, 51, 102, 0.05));
+            border: 1px solid var(--secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .warning-box::before {
+            content: '⚠️';
+            font-size: 2rem;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+        }
+        
+        th {
+            background: linear-gradient(135deg, var(--dark-light), rgba(26, 26, 26, 0.8));
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        td {
+            background: rgba(26, 26, 26, 0.3);
+        }
+        
+        tr:hover td {
+            background: rgba(0, 255, 136, 0.05);
+        }
+        
+        .conclusion {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 204, 255, 0.1));
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 3rem;
+            margin: 4rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .conclusion::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+            animation: rotate 4s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .conclusion-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .glitch { font-size: 2.5rem; }
+            .typewriter { font-size: 1.2rem; }
+            .section-number { font-size: 2rem; }
+            .section-title { font-size: 1.8rem; }
+            .main-content { padding-left: 1rem; padding-right: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Background -->
+    <div class="matrix-bg" id="matrix-bg"></div>
+    
+    <!-- Welcome Screen -->
+    <div class="welcome-screen">
+        <h1 class="glitch" data-text="RONIX EXPOSED">RONIX EXPOSED</h1>
+        <p class="typewriter">Hello, I'm Crypted and I'm going to be exposing Ronix</p>
+        <div class="scroll-indicator" onclick="scrollToContent()">
+            <p>Let's get right into it</p>
+            <div style="font-size: 2rem; margin-top: 1rem;">↓</div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Section 1: Overview -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-number">01</span>
+                <h2 class="section-title">Executive Summary</h2>
+            </div>
+            <p>Through comprehensive static and dynamic analysis, we have identified <span class="danger">Ronix-Loader.exe</span> as a sophisticated threat actor tool. This technical analysis presents our findings regarding the malware's architecture, behavior patterns, and operational capabilities.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">19</div>
+                    <div class="stat-label">MiB File Size</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Malicious Rating</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">65%</div>
+                    <div class="stat-label">AV Detection</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">51</div>
+                    <div class="stat-label">Threat Indicators</div>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <h3 class="danger">CRITICAL THREAT CLASSIFICATION</h3>
+                <p><strong>File Type:</strong> PE 64-bit Windows executable<br>
+                <strong>Threat Type:</strong> Trojan[Packed]/Win64.VMProtect<br>
+                <strong>Analysis Tools:</strong> Ghidra, Hybrid Analysis, Falcon Sandbox</p>
+            </div>
+        </div>
+        
+        <!-- Section 2: PE Structure Analysis -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-number">02</span>
+                <h2 class="section-title">Deconstructing the Executable</h2>
+            </div>
+            <p>The PE structure alone reveals the malicious intent. Look at these <span class="danger">non-standard sections</span> - legitimate software would never use section names like <span class="highlight">.ronix0, .ronix1, .ronix2</span>.</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>Address Range</th>
+                            <th>Size</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>.text</td>
+                            <td>0x140001000 – 0x1400367A7</td>
+                            <td>0x357A8</td>
+                            <td>Executable code</td>
+                        </tr>
+                        <tr>
+                            <td>.rdata</td>
+                            <td>0x140037000 – 0x14004BD5F</td>
+                            <td>0x14D60</td>
+                            <td>Strings and constants</td>
+                        </tr>
+                        <tr>
+                            <td class="danger">.ronix0</td>
+                            <td>0x140054000 – 0x140BDFAE9</td>
+                            <td class="danger">0xB8BAEA</td>
+                            <td class="danger">Obfuscated payload loader</td>
+                        </tr>
+                        <tr>
+                            <td class="danger">.ronix1</td>
+                            <td>0x140BE0000 – 0x140BE0BFF</td>
+                            <td class="danger">0xC00</td>
+                            <td class="danger">Extra payload/data</td>
+                        </tr>
+                        <tr>
+                            <td class="danger">.ronix2</td>
+                            <td>0x140BE1000 – 0x141F56FFF</td>
+                            <td class="danger">0x1376000</td>
+                            <td class="danger">Main obfuscated payload</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="code-block">
+                <h4 class="highlight">Key Observation:</h4>
+                <p>The .ronix sections contain over <span class="danger">20MB</span> of obfuscated data. This is where the real malware lives, hidden from basic static analysis tools.</p>
+            </div>
+        </div>
+        
+        <!-- Section 3: API Analysis -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-number">03</span>
+                <h2 class="section-title">Malicious API Usage Exposed</h2>
+            </div>
+            <p>The imported functions tell the complete story. This malware uses <span class="danger">dynamic API resolution</span> to hide its true intentions from static analysis.</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Malicious Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="danger">GetProcAddress / LoadLibraryA</td>
+                            <td>Dynamically resolves APIs to avoid static detection</td>
+                        </tr>
+                        <tr>
+                            <td class="danger">InternetOpenUrlA</td>
+                            <td>Can contact C2 servers for commands/data</td>
+                        </tr>
+                        <tr>
+                            <td class="danger">HeapAlloc / HeapFree</td>
+                            <td>Allocates memory dynamically for hidden payloads</td>
+                        </tr>
+                        <tr>
+                            <td class="info">GetSystemTimeAsFileTime</td>
+                            <td>Anti-debug/timing checks</td>
+                        </tr>
+                        <tr>
+                            <td class="danger">ExitProcess</td>
+                            <td>Used to terminate processes and hide traces</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="code-block">
+                <span class="highlight">Analysis Result:</span> Dynamic API resolution + network functions = <span class="danger">confirmed malicious behavior</span>
+            </div>
+        </div>
+        
+        <!-- Section 4: Obfuscation Techniques -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-number">04</span>
+                <h2 class="section-title">Advanced Obfuscation Uncovered</h2>
+            </div>
+            <p>The decompiled code in Ghidra revealed sophisticated obfuscation techniques designed to frustrate reverse engineers and security researchers.</p>
+            
+            <div class="code-block">
+                <h4 class="danger">Obfuscation Methods Identified:</h4>
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li><span class="highlight">XOR/RC4 encryption</span> for payload decoding</li>
+                    <li><span class="highlight">Magic constants</span> and bit shifting operations</li>
+                    <li><span class="highlight">Pointer arithmetic</span> to obscure data flow</li>
+                    <li><span class="highlight">Function name obfuscation</span> (func_0x...)</li>
+                    <li><span class="highlight">High entropy sections</span> to hide packed content</li>
+                </ul>
+            </div>
+            
+            <div class="warning-box">
+                <h3>Why This Matters</h3>
+                <p>This level of obfuscation is <strong>never</strong> used in legitimate software. It's a clear indicator of malicious intent and sophisticated threat actors.</p>
+            </div>
+        </div>
+        
+        <!-- Section 5: Sandbox Analysis Results -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-number">05</span>
+                <h2 class="section-title">Sandbox Confirms Our Worst Fears</h2>
+            </div>
+            <p>Both Hybrid Analysis and Falcon Sandbox delivered the same verdict: <span class="danger">100% malicious</span>. The behavioral analysis revealed the true scope of this threat.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">30</div>
+                    <div class="stat-label">MITRE ATT&CK Techniques</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Attack Tactics</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">51</div>
+                    <div class="stat-label">IoC Indicators</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">.ronix2</div>
+                    <div class="stat-label">Unusual Entrypoint</div>
+                </div>
+            </div>
+            
+            <div class="code-block">
+                <h4 class="danger">Confirmed Capabilities:</h4>
+                <p>✓ Anti-detection and stealth mechanisms<br>
+                ✓ Network communication with C2 servers<br>
+                ✓ Registry monitoring and modification<br>
+                ✓ Remote code execution capabilities<br>
+                ✓ Scheduled transfers and persistence<br>
+                ✓ Dynamic library loading for evasion</p>
+            </div>
+        </div>
+        
+        <!-- Section 6: Network Behavior -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-number">06</span>
+                <h2 class="section-title">Command & Control Infrastructure</h2>
+            </div>
+            <p>The network analysis reveals this malware's ability to communicate with remote command and control servers, making it a serious threat for data exfiltration and remote access.</p>
+            
+            <div class="warning-box">
+                <h3 class="danger">ACTIVE THREAT WARNING</h3>
+                <p>This malware actively attempts to establish outbound connections. It can receive commands, download additional payloads, and exfiltrate sensitive data from infected systems.</p>
+            </div>
+            
+            <div class="code-block">
+                <span class="highlight">Network Indicators:</span><br>
+                • InternetOpenUrlA calls detected<br>
+                • Encrypted communication protocols<br>
+                • Scheduled data transmission<br>
+                • DNS resolution of suspicious domains<br>
+                • HTTP/HTTPS traffic with encoded payloads
+            </div>
+        </div>
+        
+        <!-- Section 7: Persistence Mechanisms -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-number">07</span>
+                <h2 class="section-title">How Ronix Maintains Its Grip</h2>
+            </div>
+            <p>The malware doesn't just infect and leave - it establishes multiple persistence mechanisms to ensure it survives reboots and security scans.</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Technique</th>
+                            <th>Method</th>
+                            <th>Threat Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Registry Manipulation</td>
+                            <td>Auto-start entries</td>
+                            <td class="danger">Critical</td>
+                        </tr>
+                        <tr>
+                            <td>Scheduled Tasks</td>
+                            <td>System task creation</td>
+                            <td class="danger">High</td>
+                        </tr>
+                        <tr>
+                            <td>Process Injection</td>
+                            <td>Legitimate process hijacking</td>
+                            <td class="danger">Critical</td>
+                        </tr>
+                        <tr>
+                            <td>File System Hiding</td>
+                            <td>Steganography and rootkit techniques</td>
+                            <td class="info">Medium</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Section 8: Impact Assessment -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-number">08</span>
+                <h2 class="section-title">Real-World Damage Potential</h2>
+            </div>
+            <p>Based on the technical analysis, Ronix-Loader poses severe risks to both individual users and enterprise environments.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">●●●●●</div>
+                    <div class="stat-label">Data Theft Risk</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">●●●●●</div>
+                    <div class="stat-label">System Compromise</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">●●●●○</div>
+                    <div class="stat-label">Network Spread</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">●●●●●</div>
+                    <div class="stat-label">Persistence Level</div>
+                </div>
+            </div>
+            
+            <div class="code-block">
+                <h4 class="danger">Potential Impacts:</h4>
+                <p>• Complete system compromise and backdoor access<br>
+                • Theft of sensitive personal and financial data<br>
+                • Installation of additional malware payloads<br>
+                • Use of infected systems in botnet operations<br>
+                • Lateral movement within corporate networks<br>
+                • Cryptocurrency mining and resource abuse</p>
+            </div>
+        </div>
+        
+        <!-- Conclusion -->
+        <div class="conclusion">
+            <div class="conclusion-content">
+                <h2 style="font-size: 2.5rem; margin-bottom: 2rem; color: var(--primary);">FINAL VERDICT</h2>
+                <p style="font-size: 1.3rem; margin-bottom: 2rem;">Ronix-Loader.exe is not just malware - it's a sophisticated threat that represents the evolution of modern cybercrime.</p>
+                <p style="font-size: 1.1rem; margin-bottom: 2rem;">This comprehensive analysis proves beyond doubt that Ronix employs advanced evasion techniques, maintains persistent access, and poses severe risks to any infected system.</p>
+                <div style="background: rgba(255, 51, 102, 0.2); padding: 2rem; border-radius: 8px; margin: 2rem 0;">
+                    <h3 style="color: var(--secondary); margin-bottom: 1rem;">⚠️ CRITICAL WARNING ⚠️</h3>
+                    <p><strong>If you encounter Ronix-Loader.exe or similar files, DO NOT EXECUTE them under any circumstances. Immediately isolate the file and run a full system scan.</strong></p>
+                </div>
+                <p style="font-size: 0.9rem; margin-top: 2rem; color: var(--text-dim);">This analysis was conducted in a controlled environment for educational and security research purposes. Stay safe, stay vigilant.</p>
+                <div style="margin-top: 3rem; font-family: 'JetBrains Mono', monospace; color: var(--primary);">
+                    - Crypted
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Matrix Background Effect
+        function createMatrix() {
+            const matrixBg = document.getElementById('matrix-bg');
+            const characters = '0123456789ABCDEFabcdef01234567890123456789';
+            
+            for (let i = 0; i < 50; i++) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                column.style.left = Math.random() * 100 + 'vw';
+                column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                column.style.animationDelay = Math.random() * 2 + 's';
+                
+                let text = '';
+                for (let j = 0; j < 20; j++) {
+                    text += characters.charAt(Math.floor(Math.random() * characters.length)) + '<br>';
+                }
+                
+                column.innerHTML = text;
+                matrixBg.appendChild(column);
+            }
+        }
+        
+        // Smooth scroll to main content
+        function scrollToContent() {
+            document.querySelector('.main-content').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+        
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Animate stats numbers
+                    const statNumbers = entry.target.querySelectorAll('.stat-number');
+                    statNumbers.forEach(stat => {
+                        const finalValue = stat.textContent;
+                        if (!isNaN(finalValue) && finalValue !== '') {
+                            animateNumber(stat, 0, parseInt(finalValue), 2000);
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+        
+        // Animate numbers
+        function animateNumber(element, start, end, duration) {
+            let startTime = null;
+            const step = (timestamp) => {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const current = Math.floor(progress * (end - start) + start);
+                element.textContent = current;
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            };
+            requestAnimationFrame(step);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createMatrix();
+            
+            // Observe all sections
+            document.querySelectorAll('.section').forEach(section => {
+                observer.observe(section);
+            });
+            
+            // Glitch effect enhancement
+            const glitchElement = document.querySelector('.glitch');
+            setInterval(() => {
+                glitchElement.style.textShadow = `
+                    ${Math.random() * 4 - 2}px ${Math.random() * 4 - 2}px 0 #ff3366,
+                    ${Math.random() * 4 - 2}px ${Math.random() * 4 - 2}px 0 #00ccff,
+                    0 0 20px #00ff88
+                `;
+                setTimeout(() => {
+                    glitchElement.style.textShadow = '0 0 20px #00ff88';
+                }, 100);
+            }, 3000);
+            
+            // Enhanced hover effects for code blocks
+            document.querySelectorAll('.code-block').forEach(block => {
+                block.addEventListener('mouseenter', () => {
+                    block.style.borderColor = 'rgba(0, 255, 136, 0.5)';
+                    block.style.boxShadow = '0 10px 30px rgba(0, 255, 136, 0.1)';
+                });
+                
+                block.addEventListener('mouseleave', () => {
+                    block.style.borderColor = 'rgba(0, 255, 136, 0.2)';
+                    block.style.boxShadow = 'none';
+                });
+            });
+            
+            // Dynamic table row highlighting
+            document.querySelectorAll('tr').forEach(row => {
+                row.addEventListener('mouseenter', () => {
+                    row.style.transform = 'scale(1.02)';
+                    row.style.transition = 'transform 0.2s ease';
+                });
+                
+                row.addEventListener('mouseleave', () => {
+                    row.style.transform = 'scale(1)';
+                });
+            });
+            
+            // Typewriter effect completion callback
+            setTimeout(() => {
+                const typewriter = document.querySelector('.typewriter');
+                typewriter.style.borderRight = 'none';
+                
+                // Add pulsing effect to scroll indicator
+                const scrollIndicator = document.querySelector('.scroll-indicator');
+                scrollIndicator.style.opacity = '1';
+                scrollIndicator.style.animation = 'bounce 2s infinite, pulse 3s infinite';
+            }, 4000);
+            
+            // Random matrix updates
+            setInterval(() => {
+                const columns = document.querySelectorAll('.matrix-column');
+                const randomColumn = columns[Math.floor(Math.random() * columns.length)];
+                if (randomColumn) {
+                    const characters = '0123456789ABCDEFabcdef';
+                    let newText = '';
+                    for (let i = 0; i < 20; i++) {
+                        newText += characters.charAt(Math.floor(Math.random() * characters.length)) + '<br>';
+                    }
+                    randomColumn.innerHTML = newText;
+                }
+            }, 5000);
+            
+            // Add cursor trail effect
+            document.addEventListener('mousemove', (e) => {
+                const trail = document.createElement('div');
+                trail.style.position = 'fixed';
+                trail.style.left = e.clientX + 'px';
+                trail.style.top = e.clientY + 'px';
+                trail.style.width = '4px';
+                trail.style.height = '4px';
+                trail.style.background = 'rgba(0, 255, 136, 0.6)';
+                trail.style.borderRadius = '50%';
+                trail.style.pointerEvents = 'none';
+                trail.style.zIndex = '9999';
+                trail.style.animation = 'fadeOut 0.5s ease-out forwards';
+                
+                document.body.appendChild(trail);
+                
+                setTimeout(() => {
+                    if (trail.parentNode) {
+                        trail.parentNode.removeChild(trail);
+                    }
+                }, 500);
+            });
+            
+            // Add CSS for fade out animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeOut {
+                    0% { opacity: 1; transform: scale(1); }
+                    100% { opacity: 0; transform: scale(0); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+        
+        // Prevent right-click context menu for dramatic effect
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            
+            playNotificationSound('warning');
+            
+            // Show custom "ACCESS DENIED" message
+            const warning = document.createElement('div');
+            warning.innerHTML = 'ACCESS DENIED';
+            warning.style.position = 'fixed';
+            warning.style.left = e.clientX + 'px';
+            warning.style.top = e.clientY + 'px';
+            warning.style.background = 'rgba(255, 51, 102, 0.9)';
+            warning.style.color = 'white';
+            warning.style.padding = '10px 20px';
+            warning.style.borderRadius = '5px';
+            warning.style.fontFamily = "'JetBrains Mono', monospace";
+            warning.style.fontSize = '14px';
+            warning.style.fontWeight = 'bold';
+            warning.style.zIndex = '10000';
+            warning.style.pointerEvents = 'none';
+            warning.style.animation = 'glitch 0.5s ease-out forwards';
+            
+            document.body.appendChild(warning);
+            
+            setTimeout(() => {
+                if (warning.parentNode) {
+                    warning.parentNode.removeChild(warning);
+                }
+            }, 1000);
+        });
+        
+        // Easter egg: Konami code
+        let konamiCode = [];
+        const targetCode = [
+            'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+            'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+            'KeyB', 'KeyA'
+        ];
+        
+        document.addEventListener('keydown', (e) => {
+            konamiCode.push(e.code);
+            if (konamiCode.length > targetCode.length) {
+                konamiCode.shift();
+            }
+            
+            if (JSON.stringify(konamiCode) === JSON.stringify(targetCode)) {
+                // Activate special effect
+                document.body.style.filter = 'hue-rotate(180deg) saturate(2)';
+                document.querySelector('.glitch').textContent = 'MATRIX BREACHED';
+                
+            setTimeout(() => {
+                document.body.style.filter = 'none';
+                document.querySelector('.glitch').textContent = 'RONIX EXPOSED';
+            }, 3000);
+            
+            konamiCode = [];
+        }
+    });
+    </script>
+
+    <!-- Background music -->
+    <audio id="bg-music" loop>
+        <source src="music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+    // Attempt to autoplay, or wait for user interaction if blocked
+    window.addEventListener('load', () => {
+        const audio = document.getElementById('bg-music');
+        audio.play().catch(() => {
+            const resume = () => {
+                audio.play().catch(()=>{});
+                window.removeEventListener('click', resume);
+                window.removeEventListener('keydown', resume);
+            };
+            window.addEventListener('click', resume, { once: true });
+            window.addEventListener('keydown', resume, { once: true });
+        });
+    });
+    </script>
+</body>
+</html>
+
+
+
+                
